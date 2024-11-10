@@ -12,6 +12,9 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        pretendard: ["var(--font-pretendard)"],
+      },
     },
   },
   plugins: [],
