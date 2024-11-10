@@ -24,8 +24,10 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [canvasImgData, setCanvasImageData] = useState<ImageData | null>(null);
+  const [imgWidth, setImgWidth] = useState(0);
+  const [imgHeight, setImgHeight] = useState(0);
   const [tab, setTab] = useState(TAB_TYPE.BRIGHTNESS);
+  const [canvasImgData, setCanvasImageData] = useState<ImageData | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageDataUrl = usePreviewImg(imageFile);
@@ -52,6 +54,9 @@ export default function Home() {
     if (!ctx) return;
     canvasRef.current.width = imageRef.current.width;
     canvasRef.current.height = imageRef.current.height;
+    setImgWidth(imageRef.current.width);
+    setImgHeight(imageRef.current.height);
+
     ctx.drawImage(imageRef.current, 0, 0);
 
     const imageData = ctx.getImageData(
@@ -244,7 +249,12 @@ export default function Home() {
             onClick={handleImageUploadClick}
           >
             {imageDataUrl ? (
-              <>
+              <div
+                style={{
+                  width: "480px",
+                  height: `${(imgHeight / imgWidth) * 480}px`,
+                }}
+              >
                 <img
                   ref={imageRef}
                   className="w-full h-full hidden"
@@ -252,8 +262,8 @@ export default function Home() {
                   alt="target-image"
                   onLoad={onLoadImage}
                 />
-                <canvas ref={canvasRef} />
-              </>
+                <canvas className="w-full h-full" ref={canvasRef} />
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-2 ">
                 <ImageIcon height={40} width={40} color="#9333ea" />
