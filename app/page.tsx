@@ -6,12 +6,6 @@ import { ImageIcon } from "lucide-react";
 
 import { usePreviewImg } from "./_hooks/usePreviewImage";
 import { Slider } from "./_components/Slider";
-import {
-  getOffset,
-  gammaBrightness,
-  linearContrast,
-  linearSaturation,
-} from "./_utils/images";
 
 enum TAB_TYPE {
   BRIGHTNESS,
@@ -27,7 +21,6 @@ export default function Home() {
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [tab, setTab] = useState(TAB_TYPE.BRIGHTNESS);
-  const [canvasImgData, setCanvasImageData] = useState<ImageData | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageDataUrl = usePreviewImg(imageFile);
@@ -58,14 +51,6 @@ export default function Home() {
     setImgHeight(imageRef.current.height);
 
     ctx.drawImage(imageRef.current, 0, 0);
-
-    const imageData = ctx.getImageData(
-      0,
-      0,
-      imageRef.current.width,
-      imageRef.current.height
-    );
-    setCanvasImageData(imageData);
   };
 
   const handleTab = (tab: TAB_TYPE) => () => {
@@ -73,62 +58,17 @@ export default function Home() {
   };
 
   const processImage = () => {
-    if (!canvasRef.current || !canvasImgData) return;
+    if (!canvasRef.current || !imageRef.current) return;
 
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
-    const imageData = ctx.getImageData(
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
-    const orgImageData = [...canvasImgData.data];
-
-    for (let y = 0; y < canvasRef.current.height; y++) {
-      for (let x = 0; x < canvasRef.current.width; x++) {
-        const offset = getOffset(x, y, canvasRef.current.width);
-
-        const r = orgImageData[offset];
-        const g = orgImageData[offset + 1];
-        const b = orgImageData[offset + 2];
-
-        const grayScale = (r + g + b) / 3;
-
-        imageData.data[offset] = linearSaturation(
-          linearContrast(
-            gammaBrightness(r, brightnessCoefficient),
-            contrastCoefficient
-          ),
-          saturationCoefficient,
-          grayScale
-        );
-        imageData.data[offset + 1] = linearSaturation(
-          linearContrast(
-            gammaBrightness(g, brightnessCoefficient),
-            contrastCoefficient
-          ),
-          saturationCoefficient,
-          grayScale
-        );
-        imageData.data[offset + 2] = linearSaturation(
-          linearContrast(
-            gammaBrightness(b, brightnessCoefficient),
-            contrastCoefficient
-          ),
-          saturationCoefficient,
-          grayScale
-        );
-        imageData.data[offset + 3] = orgImageData[offset + 3];
-      }
-    }
-    ctx?.putImageData(imageData, 0, 0);
+    ctx.filter = `contrast(${contrastCoefficient}) brightness(${brightnessCoefficient}) saturate(${saturationCoefficient})`;
+    ctx.drawImage(imageRef.current, 0, 0);
   };
 
   const handleBrightness = (coefficient: number) => {
     setBrightnessCoefficient(coefficient);
-    if (!canvasRef.current || !canvasImgData) return;
     processImage();
   };
 
