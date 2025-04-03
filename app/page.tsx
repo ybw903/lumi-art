@@ -1,11 +1,12 @@
 "use client";
 
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImageIcon } from "lucide-react";
 
 import { usePreviewImg } from "./_hooks/usePreviewImage";
 import { Slider } from "./_components/Slider";
+import { useCanvasRendererContext } from "./_contexts/CanvasRendererContext";
 
 enum TAB_TYPE {
   BRIGHTNESS,
@@ -16,18 +17,16 @@ enum TAB_TYPE {
 export default function Home() {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [imgWidth, setImgWidth] = useState(0);
-  const [imgHeight, setImgHeight] = useState(0);
+  const { adjustments, createCanvasRenderer, setImage, setAdjustments } =
+    useCanvasRendererContext();
+
   const [tab, setTab] = useState(TAB_TYPE.BRIGHTNESS);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageDataUrl = usePreviewImg(imageFile);
-
-  const [brightnessCoefficient, setBrightnessCoefficient] = useState(1);
-  const [contrastCoefficient, setContrastCoefficient] = useState(1);
-  const [saturationCoefficient, setSaturationCoefficient] = useState(1);
 
   const handleImageUploadClick = () => {
     if (!imageInputRef.current) return;
@@ -42,45 +41,38 @@ export default function Home() {
 
   const onLoadImage = () => {
     if (!canvasRef.current || !imageRef.current) return;
-    const ctx = canvasRef.current.getContext("2d");
-
-    if (!ctx) return;
-    canvasRef.current.width = imageRef.current.width;
-    canvasRef.current.height = imageRef.current.height;
-    setImgWidth(imageRef.current.width);
-    setImgHeight(imageRef.current.height);
-
-    ctx.drawImage(imageRef.current, 0, 0);
+    setImage(imageRef.current);
   };
 
   const handleTab = (tab: TAB_TYPE) => () => {
     setTab(tab);
   };
 
-  const processImage = () => {
-    if (!canvasRef.current || !imageRef.current) return;
-
-    const ctx = canvasRef.current.getContext("2d");
-    if (!ctx) return;
-
-    ctx.filter = `contrast(${contrastCoefficient}) brightness(${brightnessCoefficient}) saturate(${saturationCoefficient})`;
-    ctx.drawImage(imageRef.current, 0, 0);
-  };
-
   const handleBrightness = (coefficient: number) => {
-    setBrightnessCoefficient(coefficient);
-    processImage();
+    setAdjustments({ ...adjustments, brightness: coefficient });
   };
 
   const handleContrast = (coefficient: number) => {
-    setContrastCoefficient(coefficient);
-    processImage();
+    setAdjustments({ ...adjustments, contrast: coefficient });
   };
 
   const handleSaturation = (coefficient: number) => {
-    setSaturationCoefficient(coefficient);
-    processImage();
+    setAdjustments({ ...adjustments, saturation: coefficient });
   };
+
+  useEffect(() => {
+    if (!imageDataUrl) return;
+    if (!canvasRef.current || !canvasContainerRef.current) return;
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    createCanvasRenderer({
+      canvas: canvasRef.current,
+      pixelRatio: devicePixelRatio,
+      dimensions: {
+        width: canvasContainerRef.current.clientWidth,
+        height: canvasContainerRef.current.clientHeight,
+      },
+    });
+  }, [imageDataUrl]);
 
   return (
     <div className="w-full min-h-screen">
@@ -143,9 +135,9 @@ export default function Home() {
               {tab === TAB_TYPE.BRIGHTNESS && (
                 <>
                   <Slider
-                    value={[brightnessCoefficient]}
-                    max={2}
-                    min={0}
+                    value={[adjustments.brightness]}
+                    max={1}
+                    min={-1}
                     step={0.01}
                     onValueChange={([value]) => handleBrightness(value)}
                   />
@@ -163,18 +155,18 @@ export default function Home() {
               )}
               {tab === TAB_TYPE.CONTRAST && (
                 <Slider
-                  value={[contrastCoefficient]}
-                  max={2}
-                  min={0}
+                  value={[adjustments.contrast]}
+                  max={1}
+                  min={-1}
                   step={0.01}
                   onValueChange={([value]) => handleContrast(value)}
                 />
               )}
               {tab === TAB_TYPE.SATURATION && (
                 <Slider
-                  value={[saturationCoefficient]}
-                  max={2}
-                  min={0}
+                  value={[adjustments.saturation]}
+                  max={1}
+                  min={-1}
                   step={0.01}
                   onValueChange={([value]) => handleSaturation(value)}
                 />
@@ -190,9 +182,9 @@ export default function Home() {
           >
             {imageDataUrl ? (
               <div
+                ref={canvasContainerRef}
                 style={{
                   width: "480px",
-                  height: `${(imgHeight / imgWidth) * 480}px`,
                 }}
               >
                 <img

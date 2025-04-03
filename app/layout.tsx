@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { CanvasRendererProvider } from "./_contexts/CanvasRendererContext";
 
 const pretendard = localFont({
   src: "./fonts/PretendardVariable.woff2",
@@ -23,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pretendard.variable} font-pretendard antialiased`}>
-        {children}
+        <CanvasRendererProvider>{children}</CanvasRendererProvider>
       </body>
     </html>
   );
