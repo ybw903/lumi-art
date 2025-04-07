@@ -3,10 +3,12 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { ImageIcon } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 import { usePreviewImg } from "./_hooks/usePreviewImage";
 import { Slider } from "./_components/Slider";
 import { useCanvasRendererContext } from "./_contexts/CanvasRendererContext";
+import { SUPPORTED_MIME_TYPES } from "./_constants/file";
 
 enum TAB_TYPE {
   BRIGHTNESS,
@@ -20,8 +22,13 @@ export default function Home() {
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { adjustments, createCanvasRenderer, setImage, setAdjustments } =
-    useCanvasRendererContext();
+  const {
+    adjustments,
+    render,
+    createCanvasRenderer,
+    setImage,
+    setAdjustments,
+  } = useCanvasRendererContext();
 
   const [tab, setTab] = useState(TAB_TYPE.BRIGHTNESS);
 
@@ -37,6 +44,18 @@ export default function Home() {
     const imgFile = evt.target.files?.[0];
     if (!imgFile) return;
     setImageFile(imgFile);
+  };
+
+  const handleDownloadImage = () => {
+    render();
+    const dataUrl = canvasRef.current?.toDataURL(imageFile?.type);
+    if (!dataUrl) return;
+
+    const aElement = document.createElement("a");
+    aElement.download = `${uuidv4()}.${imageFile?.type.split("/")[1]}`;
+    aElement.href = dataUrl;
+
+    aElement.click();
   };
 
   const onLoadImage = () => {
@@ -175,7 +194,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="my-8 flex gap-4">
+        <section className="my-8 flex gap-4">
           <button
             className="w-[320px] md:w-[480px] min-h-[360px] p-8 flex justify-center items-center rounded-xl border-[2.5px] border-dashed border-purple-600"
             onClick={handleImageUploadClick}
@@ -212,7 +231,18 @@ export default function Home() {
             type="file"
             onChange={handleUploadImage}
           />
-        </div>
+        </section>
+        {imageDataUrl &&
+          SUPPORTED_MIME_TYPES.includes(imageFile?.type ?? "") && (
+            <section className="mt-4 mb-10" onClick={handleDownloadImage}>
+              <button
+                className="w-[320px] md:w-[480px] p-4 bg-violet-700 rounded-lg font-bold text-white"
+                onClick={handleDownloadImage}
+              >
+                내보내기
+              </button>
+            </section>
+          )}
       </main>
     </div>
   );

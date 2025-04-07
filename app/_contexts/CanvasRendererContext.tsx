@@ -19,6 +19,7 @@ import {
 export interface ICanvasRendererContext {
   adjustments: AdjustmentParameters;
   previewCanvasDimensions: Dimensions;
+  render: () => void;
   createCanvasRenderer: (params: {
     canvas: HTMLCanvasElement;
     dimensions: Dimensions;
@@ -181,6 +182,7 @@ export const CanvasRendererProvider = ({ children }: PropsWithChildren) => {
       value={{
         adjustments,
         previewCanvasDimensions,
+        render,
         createCanvasRenderer,
         setImage,
         setAdjustments,
