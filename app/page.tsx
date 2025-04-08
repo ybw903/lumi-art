@@ -133,10 +133,10 @@ export default function Home() {
       <main className="mt-8 flex flex-col items-center">
         {imageDataUrl && (
           <section className="flex flex-col items-center">
-            <div className="w-[320px] md:w-[480px] p-2 flex gap-2 ">
+            <div className="w-[320px] md:w-[480px] py-2 flex gap-2 overflow-auto">
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                  "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
                   tab === TAB_TYPE.BRIGHTNESS && "bg-violet-700",
                   tab !== TAB_TYPE.BRIGHTNESS && "hover:bg-violet-500"
                 )}
@@ -146,7 +146,7 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white bg-violet-400",
                   tab === TAB_TYPE.EXPOSURE && "bg-violet-700",
                   tab !== TAB_TYPE.EXPOSURE && "hover:bg-violet-500"
                 )}
@@ -156,7 +156,7 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
+                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
                   tab === TAB_TYPE.CONTRAST && "bg-violet-700",
                   tab !== TAB_TYPE.CONTRAST && "hover:bg-violet-500"
                 )}
@@ -166,7 +166,7 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
+                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
                   tab === TAB_TYPE.HIGHLIGHTS && "bg-violet-700",
                   tab !== TAB_TYPE.HIGHLIGHTS && "hover:bg-violet-500"
                 )}
@@ -176,7 +176,7 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
+                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
                   tab === TAB_TYPE.SHADOWS && "bg-violet-700",
                   tab !== TAB_TYPE.SHADOWS && "hover:bg-violet-500"
                 )}
@@ -186,7 +186,7 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
-                  "flex-1 text-center p-2 rounded  font-bold text-white bg-violet-400 ",
+                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white bg-violet-400 ",
                   tab === TAB_TYPE.SATURATION && "bg-violet-700",
                   tab !== TAB_TYPE.SATURATION && "hover:bg-violet-500"
                 )}
