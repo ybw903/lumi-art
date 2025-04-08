@@ -10,14 +10,23 @@ import { Slider } from "./_components/Slider";
 import { useCanvasRendererContext } from "./_contexts/CanvasRendererContext";
 import { SUPPORTED_MIME_TYPES } from "./_constants/file";
 
-enum TAB_TYPE {
-  BRIGHTNESS,
-  EXPOSURE,
-  CONTRAST,
-  HIGHLIGHTS,
-  SHADOWS,
-  SATURATION,
+enum AdjustmentType {
+  BRIGHTNESS = "brightness",
+  EXPOSURE = "exposure",
+  CONTRAST = "contrast",
+  HIGHLIGHTS = "highlights",
+  SHADOWS = "shadows",
+  SATURATION = "saturation",
 }
+
+const ADJUSTMENT_TYPE_RESOURCES = {
+  [AdjustmentType.BRIGHTNESS]: "밝기",
+  [AdjustmentType.EXPOSURE]: "노출",
+  [AdjustmentType.CONTRAST]: "대비",
+  [AdjustmentType.HIGHLIGHTS]: "하이라이트",
+  [AdjustmentType.SHADOWS]: "섀도우",
+  [AdjustmentType.SATURATION]: "채도",
+} as const satisfies { [key in AdjustmentType]: string };
 
 export default function Home() {
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -33,7 +42,7 @@ export default function Home() {
     setAdjustments,
   } = useCanvasRendererContext();
 
-  const [tab, setTab] = useState(TAB_TYPE.BRIGHTNESS);
+  const [tab, setTab] = useState(AdjustmentType.BRIGHTNESS);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageDataUrl = usePreviewImg(imageFile);
@@ -66,32 +75,12 @@ export default function Home() {
     setImage(imageRef.current);
   };
 
-  const handleTab = (tab: TAB_TYPE) => () => {
+  const handleTab = (tab: AdjustmentType) => () => {
     setTab(tab);
   };
 
-  const handleBrightness = (coefficient: number) => {
-    setAdjustments({ ...adjustments, brightness: coefficient });
-  };
-
-  const handleExposure = (coefficient: number) => {
-    setAdjustments({ ...adjustments, exposure: coefficient });
-  };
-
-  const handleContrast = (coefficient: number) => {
-    setAdjustments({ ...adjustments, contrast: coefficient });
-  };
-
-  const handleHighlights = (coefficient: number) => {
-    setAdjustments({ ...adjustments, highlights: coefficient });
-  };
-
-  const handleShadows = (coefficient: number) => {
-    setAdjustments({ ...adjustments, shadows: coefficient });
-  };
-
-  const handleSaturation = (coefficient: number) => {
-    setAdjustments({ ...adjustments, saturation: coefficient });
+  const handleAdjustment = (value: number, type: AdjustmentType) => {
+    setAdjustments({ ...adjustments, [type]: value });
   };
 
   useEffect(() => {
@@ -134,76 +123,31 @@ export default function Home() {
         {imageDataUrl && (
           <section className="flex flex-col items-center">
             <div className="w-[320px] md:w-[480px] py-2 flex gap-2 overflow-auto">
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
-                  tab === TAB_TYPE.BRIGHTNESS && "bg-violet-700",
-                  tab !== TAB_TYPE.BRIGHTNESS && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.BRIGHTNESS)}
-              >
-                밝기
-              </button>
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white bg-violet-400",
-                  tab === TAB_TYPE.EXPOSURE && "bg-violet-700",
-                  tab !== TAB_TYPE.EXPOSURE && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.EXPOSURE)}
-              >
-                노출
-              </button>
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
-                  tab === TAB_TYPE.CONTRAST && "bg-violet-700",
-                  tab !== TAB_TYPE.CONTRAST && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.CONTRAST)}
-              >
-                대비
-              </button>
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
-                  tab === TAB_TYPE.HIGHLIGHTS && "bg-violet-700",
-                  tab !== TAB_TYPE.HIGHLIGHTS && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.HIGHLIGHTS)}
-              >
-                하이라이트
-              </button>
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white  bg-violet-400",
-                  tab === TAB_TYPE.SHADOWS && "bg-violet-700",
-                  tab !== TAB_TYPE.SHADOWS && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.SHADOWS)}
-              >
-                섀도우
-              </button>
-              <button
-                className={clsx(
-                  "w-24 flex-shrink-0  text-center p-2 rounded  font-bold text-white bg-violet-400 ",
-                  tab === TAB_TYPE.SATURATION && "bg-violet-700",
-                  tab !== TAB_TYPE.SATURATION && "hover:bg-violet-500"
-                )}
-                onClick={handleTab(TAB_TYPE.SATURATION)}
-              >
-                채도
-              </button>
+              {Object.values(AdjustmentType).map((AdjustmentType) => (
+                <button
+                  key={`adjustment-tab-${AdjustmentType}`}
+                  className={clsx(
+                    "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                    tab === AdjustmentType && "bg-violet-700",
+                    tab !== AdjustmentType && "hover:bg-violet-500"
+                  )}
+                  onClick={handleTab(AdjustmentType)}
+                >
+                  {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
+                </button>
+              ))}
             </div>
             <div className="mt-4 w-[320px]  md:w-[480px] flex flex-col gap-8">
-              {tab === TAB_TYPE.BRIGHTNESS && (
+              {tab === AdjustmentType.BRIGHTNESS && (
                 <>
                   <Slider
                     value={[adjustments.brightness]}
                     max={1}
                     min={-1}
                     step={0.01}
-                    onValueChange={([value]) => handleBrightness(value)}
+                    onValueChange={([value]) =>
+                      handleAdjustment(value, AdjustmentType.BRIGHTNESS)
+                    }
                   />
                   {/* <div>
                     <span className="text-red-600">RED</span>
@@ -217,49 +161,59 @@ export default function Home() {
                   */}
                 </>
               )}
-              {tab === TAB_TYPE.EXPOSURE && (
+              {tab === AdjustmentType.EXPOSURE && (
                 <Slider
                   value={[adjustments.exposure]}
                   max={1}
                   min={-1}
                   step={0.01}
-                  onValueChange={([value]) => handleExposure(value)}
+                  onValueChange={([value]) =>
+                    handleAdjustment(value, AdjustmentType.EXPOSURE)
+                  }
                 />
               )}
-              {tab === TAB_TYPE.CONTRAST && (
+              {tab === AdjustmentType.CONTRAST && (
                 <Slider
                   value={[adjustments.contrast]}
                   max={1}
                   min={-1}
                   step={0.01}
-                  onValueChange={([value]) => handleContrast(value)}
+                  onValueChange={([value]) =>
+                    handleAdjustment(value, AdjustmentType.CONTRAST)
+                  }
                 />
               )}
-              {tab === TAB_TYPE.HIGHLIGHTS && (
+              {tab === AdjustmentType.HIGHLIGHTS && (
                 <Slider
                   value={[adjustments.highlights]}
                   max={0}
                   min={-1}
                   step={0.01}
-                  onValueChange={([value]) => handleHighlights(value)}
+                  onValueChange={([value]) =>
+                    handleAdjustment(value, AdjustmentType.HIGHLIGHTS)
+                  }
                 />
               )}
-              {tab === TAB_TYPE.SHADOWS && (
+              {tab === AdjustmentType.SHADOWS && (
                 <Slider
                   value={[adjustments.shadows]}
                   max={1}
                   min={0}
                   step={0.01}
-                  onValueChange={([value]) => handleShadows(value)}
+                  onValueChange={([value]) =>
+                    handleAdjustment(value, AdjustmentType.SHADOWS)
+                  }
                 />
               )}
-              {tab === TAB_TYPE.SATURATION && (
+              {tab === AdjustmentType.SATURATION && (
                 <Slider
                   value={[adjustments.saturation]}
                   max={1}
                   min={-1}
                   step={0.01}
-                  onValueChange={([value]) => handleSaturation(value)}
+                  onValueChange={([value]) =>
+                    handleAdjustment(value, AdjustmentType.SATURATION)
+                  }
                 />
               )}
             </div>
