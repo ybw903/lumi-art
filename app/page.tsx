@@ -12,7 +12,10 @@ import { SUPPORTED_MIME_TYPES } from "./_constants/file";
 
 enum TAB_TYPE {
   BRIGHTNESS,
+  EXPOSURE,
   CONTRAST,
+  HIGHLIGHTS,
+  SHADOWS,
   SATURATION,
 }
 
@@ -71,8 +74,20 @@ export default function Home() {
     setAdjustments({ ...adjustments, brightness: coefficient });
   };
 
+  const handleExposure = (coefficient: number) => {
+    setAdjustments({ ...adjustments, exposure: coefficient });
+  };
+
   const handleContrast = (coefficient: number) => {
     setAdjustments({ ...adjustments, contrast: coefficient });
+  };
+
+  const handleHighlights = (coefficient: number) => {
+    setAdjustments({ ...adjustments, highlights: coefficient });
+  };
+
+  const handleShadows = (coefficient: number) => {
+    setAdjustments({ ...adjustments, shadows: coefficient });
   };
 
   const handleSaturation = (coefficient: number) => {
@@ -131,6 +146,16 @@ export default function Home() {
               </button>
               <button
                 className={clsx(
+                  "flex-1 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                  tab === TAB_TYPE.EXPOSURE && "bg-violet-700",
+                  tab !== TAB_TYPE.EXPOSURE && "hover:bg-violet-500"
+                )}
+                onClick={handleTab(TAB_TYPE.EXPOSURE)}
+              >
+                노출
+              </button>
+              <button
+                className={clsx(
                   "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
                   tab === TAB_TYPE.CONTRAST && "bg-violet-700",
                   tab !== TAB_TYPE.CONTRAST && "hover:bg-violet-500"
@@ -138,6 +163,26 @@ export default function Home() {
                 onClick={handleTab(TAB_TYPE.CONTRAST)}
               >
                 대비
+              </button>
+              <button
+                className={clsx(
+                  "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
+                  tab === TAB_TYPE.HIGHLIGHTS && "bg-violet-700",
+                  tab !== TAB_TYPE.HIGHLIGHTS && "hover:bg-violet-500"
+                )}
+                onClick={handleTab(TAB_TYPE.HIGHLIGHTS)}
+              >
+                하이라이트
+              </button>
+              <button
+                className={clsx(
+                  "flex-1 text-center p-2 rounded  font-bold text-white  bg-violet-400",
+                  tab === TAB_TYPE.SHADOWS && "bg-violet-700",
+                  tab !== TAB_TYPE.SHADOWS && "hover:bg-violet-500"
+                )}
+                onClick={handleTab(TAB_TYPE.SHADOWS)}
+              >
+                섀도우
               </button>
               <button
                 className={clsx(
@@ -172,6 +217,15 @@ export default function Home() {
                   */}
                 </>
               )}
+              {tab === TAB_TYPE.EXPOSURE && (
+                <Slider
+                  value={[adjustments.exposure]}
+                  max={1}
+                  min={-1}
+                  step={0.01}
+                  onValueChange={([value]) => handleExposure(value)}
+                />
+              )}
               {tab === TAB_TYPE.CONTRAST && (
                 <Slider
                   value={[adjustments.contrast]}
@@ -179,6 +233,24 @@ export default function Home() {
                   min={-1}
                   step={0.01}
                   onValueChange={([value]) => handleContrast(value)}
+                />
+              )}
+              {tab === TAB_TYPE.HIGHLIGHTS && (
+                <Slider
+                  value={[adjustments.highlights]}
+                  max={0}
+                  min={-1}
+                  step={0.01}
+                  onValueChange={([value]) => handleHighlights(value)}
+                />
+              )}
+              {tab === TAB_TYPE.SHADOWS && (
+                <Slider
+                  value={[adjustments.shadows]}
+                  max={1}
+                  min={0}
+                  step={0.01}
+                  onValueChange={([value]) => handleShadows(value)}
                 />
               )}
               {tab === TAB_TYPE.SATURATION && (
