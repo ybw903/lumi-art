@@ -234,7 +234,7 @@ export default function Home() {
         </section>
         {imageDataUrl &&
           SUPPORTED_MIME_TYPES.includes(imageFile?.type ?? "") && (
-            <section className="mt-4 mb-10" onClick={handleDownloadImage}>
+            <section className="mt-4 mb-10">
               <button
                 className="w-[320px] md:w-[480px] p-4 bg-violet-700 rounded-lg font-bold text-white"
                 onClick={handleDownloadImage}
