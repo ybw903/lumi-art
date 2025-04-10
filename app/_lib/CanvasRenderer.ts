@@ -89,8 +89,8 @@ export class CanvasRenderer {
 
     const gl = this.context;
 
-    this.canvasEl.width = renderDimensions.width;
-    this.canvasEl.height = renderDimensions.height;
+    this.canvasEl.width = sourceDimensions.width;
+    this.canvasEl.height = sourceDimensions.height;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     const vertexBuffer = gl.createBuffer();
