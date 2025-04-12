@@ -4,11 +4,10 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { ImageIcon } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-
-import { usePreviewImg } from "./_hooks/usePreviewImage";
-import { Slider } from "./_components/Slider";
-import { useCanvasRendererContext } from "./_contexts/CanvasRendererContext";
-import { SUPPORTED_MIME_TYPES } from "./_constants/file";
+import { Slider } from "../_components/Slider";
+import { SUPPORTED_MIME_TYPES } from "../_constants/file";
+import { useCanvasRendererContext } from "../_contexts/CanvasRendererContext";
+import { usePreviewImg } from "../_hooks/usePreviewImage";
 
 enum AdjustmentType {
   BRIGHTNESS = "brightness",
@@ -28,7 +27,7 @@ const ADJUSTMENT_TYPE_RESOURCES = {
   [AdjustmentType.SATURATION]: "채도",
 } as const satisfies { [key in AdjustmentType]: string };
 
-export default function Home() {
+export default function DesignPage() {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
