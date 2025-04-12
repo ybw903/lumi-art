@@ -74,7 +74,7 @@ export class CanvasRenderer {
 
   public render({
     sourceDimensions,
-    renderDimensions,
+    // renderDimensions,
     transform,
     adjustments,
   }: {
