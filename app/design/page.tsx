@@ -8,6 +8,21 @@ import { Slider } from "../_components/Slider";
 import { SUPPORTED_MIME_TYPES } from "../_constants/file";
 import { useCanvasRendererContext } from "../_contexts/CanvasRendererContext";
 import { usePreviewImg } from "../_hooks/usePreviewImage";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "../_components/Sheet";
+import { useViewSize } from "../_hooks/useViewSize";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "../_components/Drawer";
 
 enum AdjustmentType {
   BRIGHTNESS = "brightness",
@@ -41,6 +56,9 @@ export default function DesignPage() {
     setAdjustments,
   } = useCanvasRendererContext();
 
+  const { isDesktop, isMobile } = useViewSize();
+
+  const [openedAdjustmentPanel, setOpenedAdjustmentPanel] = useState(false);
   const [tab, setTab] = useState(AdjustmentType.BRIGHTNESS);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -54,6 +72,7 @@ export default function DesignPage() {
   const handleUploadImage = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const imgFile = evt.target.files?.[0];
     if (!imgFile) return;
+    setOpenedAdjustmentPanel(true);
     setImageFile(imgFile);
   };
 
@@ -71,6 +90,7 @@ export default function DesignPage() {
 
   const onLoadImage = () => {
     if (!canvasRef.current || !imageRef.current) return;
+
     setImage(imageRef.current);
   };
 
@@ -85,6 +105,7 @@ export default function DesignPage() {
   useEffect(() => {
     if (!imageDataUrl) return;
     if (!canvasRef.current || !canvasContainerRef.current) return;
+
     const devicePixelRatio = window.devicePixelRatio || 1;
     createCanvasRenderer({
       canvas: canvasRef.current,
@@ -97,58 +118,57 @@ export default function DesignPage() {
   }, [imageDataUrl]);
 
   return (
-    <div className="w-full min-h-screen">
-      <header className="pt-10 md:pt-20 flex justify-center">
-        <div className="flex w-[320px] md:w-[480px] gap-4 flex-col md:flex-row items-center md:items-start">
-          <img
-            src="/logo.webp"
-            className="flex-[0_0_160px] w-[160px] h-[160px] rounded-2xl"
-            alt="lumi art"
-          />
-          <div className="flex-1 flex flex-col gap-4">
-            <h2 className="text-4xl font-bold text-transparent bg-gradient-to-br from-violet-700 to-purple-400/20 bg-clip-text">
-              Lumi Art
-            </h2>
-            <p>
-              다양한 필터와 효과로 사진을 예술적으로 바꿔보세요.
-              <br />
-              <span className="font-bold">LumiArt</span>는 빠르고 직관적인 편집
-              도구를 통해 일상 이미지를 특별하게 만들어 줍니다.
-            </p>
-          </div>
-        </div>
-      </header>
-      <main className="mt-8 flex flex-col items-center">
-        {imageDataUrl && (
-          <section className="flex flex-col items-center">
-            <div className="w-[320px] md:w-[480px] py-2 flex gap-2 overflow-auto">
-              {Object.values(AdjustmentType).map((AdjustmentType) => (
-                <button
-                  key={`adjustment-tab-${AdjustmentType}`}
-                  className={clsx(
-                    "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
-                    tab === AdjustmentType && "bg-violet-700",
-                    tab !== AdjustmentType && "hover:bg-violet-500"
-                  )}
-                  onClick={handleTab(AdjustmentType)}
-                >
-                  {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 w-[320px]  md:w-[480px] flex flex-col gap-8">
-              {tab === AdjustmentType.BRIGHTNESS && (
-                <>
-                  <Slider
-                    value={[adjustments.brightness]}
-                    max={1}
-                    min={-1}
-                    step={0.01}
-                    onValueChange={([value]) =>
-                      handleAdjustment(value, AdjustmentType.BRIGHTNESS)
-                    }
-                  />
-                  {/* <div>
+    <div className="w-full flex justify-center items-center min-h-screen">
+      {isDesktop && openedAdjustmentPanel && (
+        <aside className="w-[360px]">
+          <Sheet
+            defaultOpen={true}
+            open={openedAdjustmentPanel}
+            onOpenChange={setOpenedAdjustmentPanel}
+            modal={false}
+          >
+            <SheetContent
+              side={"left"}
+              onPointerDownOutside={(evt) => evt.preventDefault()}
+              onInteractOutside={(evt) => evt.preventDefault()}
+            >
+              <SheetHeader>
+                <SheetTitle>조정</SheetTitle>
+                <SheetDescription className="hidden">
+                  이미지 필터를 적용합니다.
+                </SheetDescription>
+              </SheetHeader>
+
+              {imageDataUrl && (
+                <section className="flex flex-col">
+                  <div className="w-full py-2 flex gap-2  overflow-auto">
+                    {Object.values(AdjustmentType).map((AdjustmentType) => (
+                      <button
+                        key={`adjustment-tab-${AdjustmentType}`}
+                        className={clsx(
+                          "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                          tab === AdjustmentType && "bg-violet-700",
+                          tab !== AdjustmentType && "hover:bg-violet-500"
+                        )}
+                        onClick={handleTab(AdjustmentType)}
+                      >
+                        {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="w-full flex flex-col py-4">
+                    {tab === AdjustmentType.BRIGHTNESS && (
+                      <>
+                        <Slider
+                          value={[adjustments.brightness]}
+                          max={1}
+                          min={-1}
+                          step={0.01}
+                          onValueChange={([value]) =>
+                            handleAdjustment(value, AdjustmentType.BRIGHTNESS)
+                          }
+                        />
+                        {/* <div>
                     <span className="text-red-600">RED</span>
                     <Slider
                       value={[rBrightness]}
@@ -158,77 +178,220 @@ export default function DesignPage() {
                     />
                   </div>
                   */}
-                </>
+                      </>
+                    )}
+                    {tab === AdjustmentType.EXPOSURE && (
+                      <Slider
+                        value={[adjustments.exposure]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.EXPOSURE)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.CONTRAST && (
+                      <Slider
+                        value={[adjustments.contrast]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.CONTRAST)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.HIGHLIGHTS && (
+                      <Slider
+                        value={[adjustments.highlights]}
+                        max={0}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.HIGHLIGHTS)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.SHADOWS && (
+                      <Slider
+                        value={[adjustments.shadows]}
+                        max={1}
+                        min={0}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.SHADOWS)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.SATURATION && (
+                      <Slider
+                        value={[adjustments.saturation]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.SATURATION)
+                        }
+                      />
+                    )}
+                  </div>
+                </section>
               )}
-              {tab === AdjustmentType.EXPOSURE && (
-                <Slider
-                  value={[adjustments.exposure]}
-                  max={1}
-                  min={-1}
-                  step={0.01}
-                  onValueChange={([value]) =>
-                    handleAdjustment(value, AdjustmentType.EXPOSURE)
-                  }
-                />
-              )}
-              {tab === AdjustmentType.CONTRAST && (
-                <Slider
-                  value={[adjustments.contrast]}
-                  max={1}
-                  min={-1}
-                  step={0.01}
-                  onValueChange={([value]) =>
-                    handleAdjustment(value, AdjustmentType.CONTRAST)
-                  }
-                />
-              )}
-              {tab === AdjustmentType.HIGHLIGHTS && (
-                <Slider
-                  value={[adjustments.highlights]}
-                  max={0}
-                  min={-1}
-                  step={0.01}
-                  onValueChange={([value]) =>
-                    handleAdjustment(value, AdjustmentType.HIGHLIGHTS)
-                  }
-                />
-              )}
-              {tab === AdjustmentType.SHADOWS && (
-                <Slider
-                  value={[adjustments.shadows]}
-                  max={1}
-                  min={0}
-                  step={0.01}
-                  onValueChange={([value]) =>
-                    handleAdjustment(value, AdjustmentType.SHADOWS)
-                  }
-                />
-              )}
-              {tab === AdjustmentType.SATURATION && (
-                <Slider
-                  value={[adjustments.saturation]}
-                  max={1}
-                  min={-1}
-                  step={0.01}
-                  onValueChange={([value]) =>
-                    handleAdjustment(value, AdjustmentType.SATURATION)
-                  }
-                />
+            </SheetContent>
+          </Sheet>
+        </aside>
+      )}
+      {isMobile && openedAdjustmentPanel && (
+        <Drawer
+          open={openedAdjustmentPanel}
+          onOpenChange={setOpenedAdjustmentPanel}
+          modal={false}
+        >
+          <DrawerContent>
+            <div className="mx-auto w-full max-w-sm">
+              <DrawerHeader>
+                <DrawerTitle>조정</DrawerTitle>
+                <DrawerDescription className="hidden">
+                  이미지 필터를 적용합니다.
+                </DrawerDescription>
+              </DrawerHeader>
+              {imageDataUrl && (
+                <section className="flex flex-col px-4">
+                  <div className="w-full py-2 flex gap-2 overflow-auto">
+                    {Object.values(AdjustmentType).map((AdjustmentType) => (
+                      <button
+                        key={`adjustment-tab-${AdjustmentType}`}
+                        className={clsx(
+                          "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                          tab === AdjustmentType && "bg-violet-700",
+                          tab !== AdjustmentType && "hover:bg-violet-500"
+                        )}
+                        onClick={handleTab(AdjustmentType)}
+                      >
+                        {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="w-full flex flex-col py-4">
+                    {tab === AdjustmentType.BRIGHTNESS && (
+                      <>
+                        <Slider
+                          value={[adjustments.brightness]}
+                          max={1}
+                          min={-1}
+                          step={0.01}
+                          onValueChange={([value]) =>
+                            handleAdjustment(value, AdjustmentType.BRIGHTNESS)
+                          }
+                        />
+                        {/* <div>
+                    <span className="text-red-600">RED</span>
+                    <Slider
+                      value={[rBrightness]}
+                      max={100}
+                      step={1}
+                      onValueChange={([r]) => setRBrightness(r)}
+                    />
+                  </div>
+                  */}
+                      </>
+                    )}
+                    {tab === AdjustmentType.EXPOSURE && (
+                      <Slider
+                        value={[adjustments.exposure]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.EXPOSURE)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.CONTRAST && (
+                      <Slider
+                        value={[adjustments.contrast]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.CONTRAST)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.HIGHLIGHTS && (
+                      <Slider
+                        value={[adjustments.highlights]}
+                        max={0}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.HIGHLIGHTS)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.SHADOWS && (
+                      <Slider
+                        value={[adjustments.shadows]}
+                        max={1}
+                        min={0}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.SHADOWS)
+                        }
+                      />
+                    )}
+                    {tab === AdjustmentType.SATURATION && (
+                      <Slider
+                        value={[adjustments.saturation]}
+                        max={1}
+                        min={-1}
+                        step={0.01}
+                        onValueChange={([value]) =>
+                          handleAdjustment(value, AdjustmentType.SATURATION)
+                        }
+                      />
+                    )}
+                  </div>
+                </section>
               )}
             </div>
-          </section>
-        )}
+          </DrawerContent>
+        </Drawer>
+      )}
 
-        <section className="my-8 flex gap-4">
+      <main
+        className={clsx(
+          "mt-8 flex flex-col items-center",
+          isDesktop && openedAdjustmentPanel && "w-[100%-360px]"
+        )}
+      >
+        <section className="my-8 flex gap-4 relative">
+          {imageDataUrl && !openedAdjustmentPanel && (
+            <div
+              className={clsx(
+                "absolute top-[-48px] py-2 px-2.5 rounded-xl bg-white shadow-md"
+              )}
+            >
+              <button
+                className="flex items-center cursor-pointer"
+                onClick={() => setOpenedAdjustmentPanel(true)}
+              >
+                <ImageIcon size={14} />
+                <span className="ml-1 text-xs font-bold">편집</span>
+              </button>
+            </div>
+          )}
+
           <button
-            className="w-[320px] md:w-[480px] min-h-[360px] p-8 flex justify-center items-center rounded-xl border-[2.5px] border-dashed border-purple-600"
+            className="w-[320px] md:w-[480px] min-h-[360px] p-8 flex justify-center items-center rounded-xl border-[2.5px] border-dashed border-[#7C6BB3]"
             onClick={handleImageUploadClick}
           >
             {imageDataUrl ? (
               <div
                 ref={canvasContainerRef}
                 style={{
-                  width: "480px",
+                  width: isDesktop ? "480px" : "320px",
                 }}
               >
                 <img
@@ -242,8 +405,8 @@ export default function DesignPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 ">
-                <ImageIcon height={40} width={40} color="#9333ea" />
-                <p className="text-purple-700  text-xs">
+                <ImageIcon height={40} width={40} color="#7C6BB3" />
+                <p className="text-[#7C6BB3]  text-xs">
                   이미지를 업로드해보세요!
                 </p>
               </div>
@@ -261,7 +424,7 @@ export default function DesignPage() {
           SUPPORTED_MIME_TYPES.includes(imageFile?.type ?? "") && (
             <section className="mt-4 mb-10">
               <button
-                className="w-[320px] md:w-[480px] p-4 bg-violet-700 rounded-lg font-bold text-white"
+                className="w-[320px] md:w-[480px] p-4 bg-[#FFE585] rounded-lg font-bold"
                 onClick={handleDownloadImage}
               >
                 내보내기
