@@ -18,7 +18,8 @@
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
     "tailwind-merge": "^2.5.4",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "^20",
