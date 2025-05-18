@@ -85,22 +85,6 @@ export const ImageAdjustment = ({
               </SheetHeader>
 
               <section className="flex flex-col">
-                <div className="w-full py-2 flex gap-2  overflow-auto">
-                  {Object.values(AdjustmentType).map((AdjustmentType) => (
-                    <button
-                      key={`adjustment-tab-${AdjustmentType}`}
-                      className={clsx(
-                        "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
-                        adjustmentType === AdjustmentType && "bg-violet-700",
-                        adjustmentType !== AdjustmentType &&
-                          "hover:bg-violet-500"
-                      )}
-                      onClick={handleAdjustmentType(AdjustmentType)}
-                    >
-                      {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
-                    </button>
-                  ))}
-                </div>
                 <div className="w-full flex flex-col py-4">
                   {adjustmentType === AdjustmentType.BRIGHTNESS && (
                     <Slider
@@ -168,6 +152,22 @@ export const ImageAdjustment = ({
                       }
                     />
                   )}
+                </div>
+                <div className="w-full py-2 flex gap-2  overflow-auto">
+                  {Object.values(AdjustmentType).map((AdjustmentType) => (
+                    <button
+                      key={`adjustment-tab-${AdjustmentType}`}
+                      className={clsx(
+                        "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                        adjustmentType === AdjustmentType && "bg-violet-700",
+                        adjustmentType !== AdjustmentType &&
+                          "hover:bg-violet-500"
+                      )}
+                      onClick={handleAdjustmentType(AdjustmentType)}
+                    >
+                      {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
+                    </button>
+                  ))}
                 </div>
               </section>
             </SheetContent>
@@ -185,22 +185,6 @@ export const ImageAdjustment = ({
                 </DrawerDescription>
               </DrawerHeader>
               <section className="flex flex-col px-4">
-                <div className="w-full py-2 flex gap-2 overflow-auto">
-                  {Object.values(AdjustmentType).map((AdjustmentType) => (
-                    <button
-                      key={`adjustment-tab-${AdjustmentType}`}
-                      className={clsx(
-                        "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
-                        adjustmentType === AdjustmentType && "bg-violet-700",
-                        adjustmentType !== AdjustmentType &&
-                          "hover:bg-violet-500"
-                      )}
-                      onClick={handleAdjustmentType(AdjustmentType)}
-                    >
-                      {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
-                    </button>
-                  ))}
-                </div>
                 <div className="w-full flex flex-col py-4">
                   {adjustmentType === AdjustmentType.BRIGHTNESS && (
                     <Slider
@@ -268,6 +252,22 @@ export const ImageAdjustment = ({
                       }
                     />
                   )}
+                </div>
+                <div className="w-full py-3 flex gap-2 overflow-auto">
+                  {Object.values(AdjustmentType).map((AdjustmentType) => (
+                    <button
+                      key={`adjustment-tab-${AdjustmentType}`}
+                      className={clsx(
+                        "w-24 flex-shrink-0 text-center p-2 rounded  font-bold text-white bg-violet-400",
+                        adjustmentType === AdjustmentType && "bg-violet-700",
+                        adjustmentType !== AdjustmentType &&
+                          "hover:bg-violet-500"
+                      )}
+                      onClick={handleAdjustmentType(AdjustmentType)}
+                    >
+                      {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
+                    </button>
+                  ))}
                 </div>
               </section>
             </div>
