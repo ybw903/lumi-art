@@ -34,6 +34,8 @@ export default function DesignPage() {
   const handleUploadImage = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const imgFile = evt.target.files?.[0];
     if (!imgFile) return;
+    if (!SUPPORTED_MIME_TYPES.includes(imageFile?.type || "")) return;
+
     setOpenedImageAdjustment(true);
     setImageFile(imgFile);
   };
@@ -136,6 +138,7 @@ export default function DesignPage() {
             ref={imageInputRef}
             type="file"
             onChange={handleUploadImage}
+            accept={SUPPORTED_MIME_TYPES.join(",")}
           />
         </section>
         {imageDataUrl &&
