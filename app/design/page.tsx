@@ -23,8 +23,8 @@ export default function DesignPage() {
 
   const [openedImageAdjustment, setOpenedImageAdjustment] = useState(false);
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const imageDataUrl = usePreviewImg(imageFile);
+  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
+  const imageDataUrl = usePreviewImg(uploadedImageFile);
 
   const handleImageUploadClick = () => {
     if (!imageInputRef.current) return;
@@ -34,19 +34,19 @@ export default function DesignPage() {
   const handleUploadImage = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const imgFile = evt.target.files?.[0];
     if (!imgFile) return;
-    if (!SUPPORTED_MIME_TYPES.includes(imageFile?.type || "")) return;
+    if (!SUPPORTED_MIME_TYPES.includes(imgFile?.type || "")) return;
 
     setOpenedImageAdjustment(true);
-    setImageFile(imgFile);
+    setUploadedImageFile(imgFile);
   };
 
   const handleDownloadImage = () => {
     render();
-    const dataUrl = canvasRef.current?.toDataURL(imageFile?.type);
+    const dataUrl = canvasRef.current?.toDataURL(uploadedImageFile?.type);
     if (!dataUrl) return;
 
     const aElement = document.createElement("a");
-    aElement.download = `${uuidv4()}.${imageFile?.type.split("/")[1]}`;
+    aElement.download = `${uuidv4()}.${uploadedImageFile?.type.split("/")[1]}`;
     aElement.href = dataUrl;
 
     aElement.click();
@@ -142,7 +142,7 @@ export default function DesignPage() {
           />
         </section>
         {imageDataUrl &&
-          SUPPORTED_MIME_TYPES.includes(imageFile?.type ?? "") && (
+          SUPPORTED_MIME_TYPES.includes(uploadedImageFile?.type ?? "") && (
             <section className="mt-4 mb-10">
               <button
                 className="w-[320px] md:w-[480px] p-4 bg-[#FFE585] rounded-lg font-bold"
