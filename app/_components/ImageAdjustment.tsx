@@ -17,6 +17,7 @@ import {
 } from "./Drawer";
 import { useViewSize } from "../_hooks/useViewSize";
 import { useCanvasRendererContext } from "../_contexts/CanvasRendererContext";
+import { Rotation, TransformParameters } from "../_lib/types";
 
 enum AdjustmentType {
   BRIGHTNESS = "brightness",
@@ -50,7 +51,8 @@ export const ImageAdjustment = ({
     AdjustmentType.BRIGHTNESS
   );
 
-  const { adjustments, setAdjustments } = useCanvasRendererContext();
+  const { adjustments, transform, setAdjustments, setTransform } =
+    useCanvasRendererContext();
 
   const handleAdjustmentType = (tab: AdjustmentType) => () => {
     setAdjustmentType(tab);
@@ -58,6 +60,16 @@ export const ImageAdjustment = ({
 
   const handleAdjustment = (value: number, type: AdjustmentType) => {
     setAdjustments({ ...adjustments, [type]: value });
+  };
+
+  const handleTransform = (
+    value: number | Rotation,
+    type: keyof TransformParameters
+  ) => {
+    setTransform({
+      ...transform,
+      [type]: value,
+    });
   };
 
   if (!open) return;
@@ -169,6 +181,22 @@ export const ImageAdjustment = ({
                     </button>
                   ))}
                 </div>
+                <div className="mt-2">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    회전
+                  </h2>
+                  <div className="py-4">
+                    <Slider
+                      value={[transform.adjust]}
+                      max={360}
+                      min={0}
+                      step={1}
+                      onValueChange={([value]) =>
+                        handleTransform(value, "adjust")
+                      }
+                    />
+                  </div>
+                </div>
               </section>
             </SheetContent>
           </Sheet>
@@ -268,6 +296,22 @@ export const ImageAdjustment = ({
                       {ADJUSTMENT_TYPE_RESOURCES[AdjustmentType]}
                     </button>
                   ))}
+                </div>
+                <div className="mt-4">
+                  <h2 className="text-lg font-semibold text-foreground text-center">
+                    회전
+                  </h2>
+                  <div className="py-4">
+                    <Slider
+                      value={[transform.adjust]}
+                      max={360}
+                      min={0}
+                      step={1}
+                      onValueChange={([value]) =>
+                        handleTransform(value, "adjust")
+                      }
+                    />
+                  </div>
                 </div>
               </section>
             </div>

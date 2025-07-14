@@ -18,6 +18,7 @@ import {
 
 export interface ICanvasRendererContext {
   adjustments: AdjustmentParameters;
+  transform: TransformParameters;
   previewCanvasDimensions: Dimensions;
   render: () => void;
   createCanvasRenderer: (params: {
@@ -27,6 +28,7 @@ export interface ICanvasRendererContext {
   }) => void;
   setImage: (inputImage: ImageData | HTMLImageElement) => void;
   setAdjustments: (adjustments: AdjustmentParameters) => void;
+  setTransform: (transform: TransformParameters) => void;
 }
 
 const CanvasRendererContext = createContext<ICanvasRendererContext | null>(
@@ -66,7 +68,7 @@ export const CanvasRendererProvider = ({ children }: PropsWithChildren) => {
     grain: 0,
     vignette: 0,
   });
-  const [transform] = useState<TransformParameters>({
+  const [transform, _setTransform] = useState<TransformParameters>({
     rotation: Rotation["0deg"],
     adjust: 0,
     cx: 0.5,
@@ -108,18 +110,27 @@ export const CanvasRendererProvider = ({ children }: PropsWithChildren) => {
     const widthRatio = previewDimensions.current.width / outputDimensions.width;
     const canvasScaleFactor = Math.min(1, heightRatio, widthRatio);
 
-    const subsamplingRatio = 1 / canvasScaleFactor / previewPixelRatio.current;
+    // const subsamplingRatio = 1 / canvasScaleFactor / previewPixelRatio.current;
     const canvasDimensions: Dimensions = {
       width: Math.round(outputDimensions.width * canvasScaleFactor),
       height: Math.round(outputDimensions.height * canvasScaleFactor),
     };
 
+    const cos = Math.abs(
+      Math.cos((scheduledRenderTransform.current.adjust * Math.PI) / 180)
+    );
+    const sin = Math.abs(
+      Math.sin((scheduledRenderTransform.current.adjust * Math.PI) / 180)
+    );
+
     const renderDimensions = {
       width: Math.round(
-        (sourceDimensions.current.width * transform.dx) / subsamplingRatio
+        sourceDimensions.current.width * transform.dx * cos +
+          sourceDimensions.current.height * transform.dy * sin
       ),
       height: Math.round(
-        (sourceDimensions.current.height * transform.dy) / subsamplingRatio
+        sourceDimensions.current.height * transform.dy * cos +
+          sourceDimensions.current.width * transform.dx * sin
       ),
     };
 
@@ -128,7 +139,10 @@ export const CanvasRendererProvider = ({ children }: PropsWithChildren) => {
       sourceDimensions: sourceDimensions.current,
       renderDimensions,
       adjustments: scheduledRenderAdjustments.current,
-      transform: scheduledRenderTransform.current,
+      transform: {
+        ...scheduledRenderTransform.current,
+        adjust: (scheduledRenderTransform.current.adjust * Math.PI) / 360,
+      },
     });
   }, [canvasRenderer, sourceDimensions, transform.dx, transform.dy]);
 
@@ -177,15 +191,25 @@ export const CanvasRendererProvider = ({ children }: PropsWithChildren) => {
     [scheduleRender, transform]
   );
 
+  const setTransform = useCallback(
+    (transform: TransformParameters) => {
+      _setTransform(transform);
+      scheduleRender(adjustments, transform);
+    },
+    [scheduleRender, adjustments]
+  );
+
   return (
     <CanvasRendererContext.Provider
       value={{
         adjustments,
+        transform,
         previewCanvasDimensions,
         render,
         createCanvasRenderer,
         setImage,
         setAdjustments,
+        setTransform,
       }}
     >
       {children}

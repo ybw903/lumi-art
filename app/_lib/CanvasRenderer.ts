@@ -74,7 +74,7 @@ export class CanvasRenderer {
 
   public render({
     sourceDimensions,
-    // renderDimensions,
+    renderDimensions,
     transform,
     adjustments,
   }: {
@@ -89,8 +89,8 @@ export class CanvasRenderer {
 
     const gl = this.context;
 
-    this.canvasEl.width = sourceDimensions.width;
-    this.canvasEl.height = sourceDimensions.height;
+    this.canvasEl.width = renderDimensions.width;
+    this.canvasEl.height = renderDimensions.height;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     const vertexBuffer = gl.createBuffer();
@@ -104,6 +104,7 @@ export class CanvasRenderer {
     const sourceAspectRatio = sourceDimensions.height / sourceDimensions.width;
 
     this.setUniform("sourceAspectRatio", sourceAspectRatio);
+
     this.setUniform(
       "desqueezeAspect",
       new Float32Array([transform.dx, transform.dy])

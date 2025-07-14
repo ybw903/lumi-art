@@ -118,6 +118,9 @@ export const FRAGMENT_SHADER_SOURCE = `
 
   void main() {
     vec2 sampleCoords = applyTransform(uv, translation, rotation);
+    if (sampleCoords.x < 0.0 || sampleCoords.y < 0.0 || sampleCoords.y > 1.0 || sampleCoords.x > 1.0) {
+      discard;
+    }
     vec4 color = texture2D(sampler, sampleCoords);
     
     color.rgb = adjustBrightness(color.rgb, brightness);

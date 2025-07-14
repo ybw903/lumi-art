@@ -108,12 +108,7 @@ export default function DesignPage() {
             onClick={handleImageUploadClick}
           >
             {imageDataUrl ? (
-              <div
-                ref={canvasContainerRef}
-                style={{
-                  width: isDesktop ? "480px" : "320px",
-                }}
-              >
+              <div ref={canvasContainerRef} className="flex-auto">
                 <img
                   ref={imageRef}
                   className="w-full h-full hidden"
