@@ -10,12 +10,14 @@ import { ImageAdjustment } from "../_components/ImageAdjustment";
 import { useCanvasRendererContext } from "../_contexts/CanvasRendererContext";
 import { usePreviewImg } from "../_hooks/usePreviewImage";
 import { useViewSize } from "../_hooks/useViewSize";
+import { useDragAndDropFile } from "../_hooks/useDragAndDropFile";
 
 export default function DesignPage() {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const imageUploadButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const { render, createCanvasRenderer, setImage } = useCanvasRendererContext();
 
@@ -25,6 +27,15 @@ export default function DesignPage() {
 
   const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
   const imageDataUrl = usePreviewImg(uploadedImageFile);
+
+  const { isDragging } = useDragAndDropFile(
+    imageUploadButtonRef,
+    (file) => {
+      setOpenedImageAdjustment(true);
+      setUploadedImageFile(file);
+    },
+    SUPPORTED_MIME_TYPES
+  );
 
   const handleImageUploadClick = () => {
     if (!imageInputRef.current) return;
@@ -104,7 +115,13 @@ export default function DesignPage() {
           )}
 
           <button
-            className="w-[320px] md:w-[480px] min-h-[360px] p-8 flex justify-center items-center rounded-xl border-[2.5px] border-dashed border-[#7C6BB3]"
+            ref={imageUploadButtonRef}
+            className={clsx(
+              "w-[320px] md:w-[480px] min-h-[360px]",
+              "flex justify-center items-center",
+              "p-8 border-[2.5px] border-dashed border-[#7C6BB3] rounded-xl",
+              isDragging && "shadow-2xl"
+            )}
             onClick={handleImageUploadClick}
           >
             {imageDataUrl ? (
